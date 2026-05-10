@@ -33,9 +33,8 @@ from flask import Flask, jsonify, render_template, request
 from sklearn.preprocessing import normalize
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-# ---------------------------------------------------------------------------
-# Konfigurasi Logging
-# ---------------------------------------------------------------------------
+
+# KONFIGURASI LOGGING
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s %(name)s: %(message)s",
@@ -43,9 +42,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Path Konfigurasi
-# ---------------------------------------------------------------------------
+
+# PATH KONFIGURASI
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 
@@ -72,15 +70,13 @@ DATA_PATHS = {
     ),
 }
 
-# ---------------------------------------------------------------------------
-# Inisialisasi Flask
-# ---------------------------------------------------------------------------
+
+# INISIALISASI FLASK
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False  # Support karakter Unicode (Indonesia)
 
-# ---------------------------------------------------------------------------
-# Singleton: Data & Model yang di-load sekali saat startup
-# ---------------------------------------------------------------------------
+
+# SINGLETON: DATA & MODEL DI-LOAD SEKALI SAAT STARTUP
 _data: dict = {}
 
 
@@ -147,10 +143,7 @@ def load_data() -> None:
     )
 
 
-# ---------------------------------------------------------------------------
-# Preprocessing Teks (sama dengan pipeline notebook)
-# ---------------------------------------------------------------------------
-
+# PREPROCESSING TEKS (SAMA DENGAN PIPELINE DI NOTEBOOK)
 def text_cleaning(text: str) -> str:
     """
     Hapus emoji, simbol non-standar, dan karakter encoding rusak.
@@ -193,10 +186,7 @@ def preprocess_query(text: str) -> str:
     return text_cleaning(text).lower()
 
 
-# ---------------------------------------------------------------------------
-# Embedding Functions (Mode 2)
-# ---------------------------------------------------------------------------
-
+# EMBEDDING FUNCTIONS (MODE 2)
 def mean_pooling(last_hidden_state: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
     """
     Masked mean pooling atas hidden states.
@@ -258,10 +248,7 @@ def embed_text(text: str) -> np.ndarray:
     return normalize(pooled_np, norm="l2")[0]                 # shape (768,)
 
 
-# ---------------------------------------------------------------------------
-# Recommendation Functions
-# ---------------------------------------------------------------------------
-
+# RECOMMENDATION FUNCTIONS
 def get_channel_info(channel_name: str) -> dict:
     """Ambil metadata channel (kategori, subscriber, link)."""
     info = _data["channel_info"]
@@ -354,10 +341,7 @@ def recommend_from_query(
     return _build_results(top_scores)
 
 
-# ---------------------------------------------------------------------------
-# Helpers: parse payload
-# ---------------------------------------------------------------------------
-
+# HELPERS: PARSE PAYLOAD
 def _parse_payload() -> dict:
     """Dukung JSON body maupun form-data."""
     if request.is_json:
@@ -372,10 +356,7 @@ def _parse_top_k(payload: dict, default: int = 5) -> int:
         return default
 
 
-# ---------------------------------------------------------------------------
-# Routes
-# ---------------------------------------------------------------------------
-
+# ROUTES
 @app.route("/", methods=["GET"])
 def index():
     """Halaman utama — tampilkan form dual-mode."""
@@ -395,7 +376,7 @@ def api_recommend_channel():
 
     Request JSON/form:
       - channel_name : str  (nama channel query)
-      - top_k        : int  (default 5, max 20)
+      - top_k        : int  (default 5, max 10)
 
     Response JSON:
       - mode, query_channel, query_info, top_k, results, error
@@ -432,7 +413,7 @@ def api_recommend_query():
 
     Request JSON/form:
       - query_text : str  (judul video yang dimasukkan user)
-      - top_k      : int  (default 5, max 20)
+      - top_k      : int  (default 5, max 10)
 
     Response JSON:
       - mode, query_text, query_text_processed, top_k, results, error
@@ -481,9 +462,7 @@ def health():
     })
 
 
-# ---------------------------------------------------------------------------
-# Entrypoint
-# ---------------------------------------------------------------------------
+# ENTRYPOINT
 if __name__ == "__main__":
     load_data()
     app.run(debug=True, host="0.0.0.0", port=5000)

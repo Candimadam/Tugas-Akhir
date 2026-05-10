@@ -1,14 +1,6 @@
-/**
- * main.js — YouTube Frontend Logic
- * ===================================
- * - Mengelola pemilihan mode input dan submit ke endpoint yang sesuai
- * - Render hasil rekomendasi ke tabel
- * - Animasi loading, error handling, dan UI helpers
- */
-
 "use strict";
 
-/* ── DOM Refs ──────────────────────────────────────────── */
+/* DOM Refs */
 const tabChannel = document.getElementById("tab-channel");
 const tabQuery = document.getElementById("tab-query");
 const panelChannel = document.getElementById("panel-channel");
@@ -47,7 +39,7 @@ const resultsTbody = document.getElementById("results-tbody");
 
 let activeMode = "channel";
 
-/* ── Mode Switch ───────────────────────────────────────── */
+/* Mode Switch */
 function setActiveMode(mode) {
   activeMode = mode;
 
@@ -68,7 +60,7 @@ function setActiveMode(mode) {
 tabChannel.addEventListener("click", () => setActiveMode("channel"));
 tabQuery.addEventListener("click", () => setActiveMode("query"));
 
-/* ── Live helpers ──────────────────────────────────────── */
+/* Live helpers */
 topKChannel.addEventListener("input", () => {
   topKChannelDisplay.textContent = topKChannel.value;
 });
@@ -83,7 +75,7 @@ queryInput.addEventListener("input", () => {
 
 setActiveMode("channel");
 
-/* ── Form Submit ───────────────────────────────────────── */
+/* Form Submit */
 formChannel.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -160,7 +152,7 @@ formQuery.addEventListener("submit", async (e) => {
   }
 });
 
-/* ── State Helpers ─────────────────────────────────────── */
+/* State Helpers */
 function setLoadingState(isLoading) {
   loadingEl.hidden = !isLoading;
   btnChannel.disabled = isLoading;
@@ -193,7 +185,7 @@ function hideResults() {
   resultsSection.hidden = true;
 }
 
-/* ── Render Results ────────────────────────────────────── */
+/* Render Results */
 function renderResults(data) {
   const isChannelMode = data.mode === "channel";
   const topK = data.top_k;
@@ -267,7 +259,7 @@ function renderResults(data) {
   resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-/* ── Utility Functions ─────────────────────────────────── */
+/* Utility Functions */
 /**
  * Format angka subscriber ke format pendek (K / Jt).
  * @param {number} num

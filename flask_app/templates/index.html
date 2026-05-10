@@ -59,18 +59,23 @@
     <main class="main-container container">
       <section class="hero" aria-labelledby="hero-title">
         <h1 id="hero-title" class="hero-title">
-          Temukan channel YouTube<br />
-          <span class="gradient-text">yang paling mirip</span>
+          Temukan Rekomendasi Channel YouTube<br />
+          <span class="gradient-text"
+            >Yang Mirip Berdasarkan Similaritas Konten</span
+          >
         </h1>
         <p class="hero-subtitle">
           Menggunakan <strong>IndoBERT</strong> fine-tuned pada
           <strong
-            >{{ ft_metadata.candidate_channels_count +
-            ft_metadata.query_channels_count }}</strong
+            >{{ ft_metadata.train_channels_count +
+            ft_metadata.validation_channels_count +
+            ft_metadata.test_channels_count }}</strong
           >
           channel Indonesia. <br />
           Silahkan pilih untuk kategori rekomendasi channel YouTube mulai dari
-          <em>Nama Channel</em> atau <em>Judul Video</em>.
+          <strong><em>Nama Channel</em></strong> atau
+          <strong><em>Judul Video</em></strong
+          >.
         </p>
       </section>
 

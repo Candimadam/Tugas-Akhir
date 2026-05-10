@@ -38,7 +38,6 @@ instance/
 
 # OUTPUT FOLDER - Ignore ONLY large files NOT needed for web app
 # Keep: channel_names.csv, video_metadata.csv, fine_tuning_experiment essentials
-
 # Ignore large embeddings/preprocessed data
 output/video_embeddings.npy
 output/preprocessed_data.csv

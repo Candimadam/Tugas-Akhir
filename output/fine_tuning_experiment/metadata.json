@@ -1,6 +1,6 @@
 {
   "model_name": "indolem/indobert-base-uncased",
-  "best_validation_accuracy": 0.719,
+  "best_validation_accuracy": 0.708,
   "num_epochs": 2,
   "batch_size": 16,
   "learning_rate": 2e-05,
@@ -17,8 +17,9 @@
     9,
     10
   ],
-  "candidate_channels_count": 70,
-  "query_channels_count": 20,
+  "train_channels_count": 70,
+  "validation_channels_count": 10,
+  "test_channels_count": 20,
   "num_labels": 10,
   "labels": [
     "Animals",
