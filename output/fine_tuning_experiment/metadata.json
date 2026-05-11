@@ -1,7 +1,7 @@
 {
   "model_name": "indolem/indobert-base-uncased",
-  "best_validation_accuracy": 0.708,
-  "num_epochs": 2,
+  "best_validation_accuracy": 0.784,
+  "num_epochs": 10,
   "batch_size": 16,
   "learning_rate": 2e-05,
   "max_length": 128,

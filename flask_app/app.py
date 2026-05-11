@@ -11,13 +11,6 @@ Mendukung DUA mode input:
     - Tokenisasi + inference IndoBERT fine-tuned (runtime embedding)
     - Mean pooling hidden state → L2 normalization
     - Hitung cosine similarity dengan semua channel embeddings (dot product)
-
-Endpoints:
-  GET  /                  → Halaman utama
-  POST /recommend_channel → Mode 1 (channel → channel)
-  POST /recommend_query   → Mode 2 (judul → channel)
-  GET  /channels          → Daftar semua channel
-  GET  /health            → Health check
 """
 
 import json
@@ -155,16 +148,16 @@ def text_cleaning(text: str) -> str:
     # Hapus emoji & simbol Unicode non-standar
     emoji_pattern = re.compile(
         "["
-        "\U0001F600-\U0001F64F"   # emoticons
-        "\U0001F300-\U0001F5FF"   # simbol & piktogram
-        "\U0001F680-\U0001F6FF"   # transport & peta
-        "\U0001F1E0-\U0001F1FF"   # bendera
-        "\U00002600-\U000026FF"   # simbol umum
-        "\U00002700-\U000027BF"   # Dingbats
-        "\U0001F900-\U0001F9FF"   # simbol tambahan
-        "\U0001FA00-\U0001FA6F"
-        "\U0001FA70-\U0001FAFF"
-        "\U00002300-\U000023FF"   # teknis
+        "\U0001F600-\U0001F64F"   # emoticons wajah (😀 😁 😂 😍 😭 😡 🙏)
+        "\U0001F300-\U0001F5FF"   # simbol & piktogram (🌟 🌈 🌍 🌙 🔥 💡 🎉)
+        "\U0001F680-\U0001F6FF"   # transport & peta (🚗 🚕 🚌 🚆 ✈️ 🚀 🚢)
+        "\U0001F1E0-\U0001F1FF"   # bendera (🇮🇩 🇺🇸 🇯🇵 🇰🇷 🇬🇧)
+        "\U00002600-\U000026FF"   # simbol umum (☀️ ☁️ ☂️ ☕ ☎️ ♨️ ⚽)
+        "\U00002700-\U000027BF"   # Dingbats (✂️ ✈️ ✉️ ✅ ❌ ❗ ❤)
+        "\U0001F900-\U0001F9FF"   # simbol tambahan (🤣 🤖 🤩 🤯 🤔 🥳 🧠 🦾)
+        "\U0001FA00-\U0001FA6F"   # simbol tambahan-A (🩰 🩸 🪀 🪁 🪐 🪑)
+        "\U0001FA70-\U0001FAFF"   # simbol tambahan-B (🩷 🩵 🩶 🪪 🪫 🫠 🫶)
+        "\U00002300-\U000023FF"   # teknis (⌚ ⌛ ⏰ ⏱️ ⏲️ ⏳)
         "]+",
         flags=re.UNICODE,
     )

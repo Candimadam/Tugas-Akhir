@@ -49,7 +49,7 @@
           <span class="logo-text">YouTube</span>
         </div>
         <nav class="header-badges" aria-label="Info model">
-          <span class="badge badge-model">indoBERT</span>
+          <span class="badge badge-model">IndoBERT</span>
           <span class="badge badge-algo">Cosine Similarity</span>
           <span class="badge badge-acc">Precision@K</span>
         </nav>
@@ -66,14 +66,9 @@
         </h1>
         <p class="hero-subtitle">
           Menggunakan <strong>IndoBERT</strong> fine-tuned pada
-          <strong
-            >{{ ft_metadata.train_channels_count +
-            ft_metadata.validation_channels_count +
-            ft_metadata.test_channels_count }}</strong
-          >
-          channel Indonesia. <br />
-          Silahkan pilih untuk kategori rekomendasi channel YouTube mulai dari
-          <strong><em>Nama Channel</em></strong> atau
+          <strong>100</strong> channel Indonesia. <br />
+          Silakan pilih kategori rekomendasi channel YouTube yang ingin kamu
+          jelajahi, mulai dari <strong><em>Nama Channel</em></strong> atau
           <strong><em>Judul Video</em></strong
           >.
         </p>
@@ -217,7 +212,7 @@
                 class="form-textarea"
                 rows="3"
                 maxlength="300"
-                placeholder="Contoh: unboxing iphone terbaru harga murah..."
+                placeholder="Contoh: Unboxing iPhone 17 Pro PALSU yang SANGAT MIRIP ASLINYA..."
                 required
               ></textarea>
               <span class="char-counter"
@@ -347,24 +342,30 @@
           <div class="info-card__icon" aria-hidden="true">📺</div>
           <h3 class="info-card__title">Kategori Nama Channel</h3>
           <p class="info-card__desc">
-            Pilih nama channel yang anda inginkan dan indoBERT akan memberikan
-            rekomendasi channel mirip dengan cepat.
+            Pilih nama channel yang anda inginkan, lalu IndoBERT akan
+            menganalisis karakteristik channel tersebut untuk memahami isi
+            kontennya dan memberikan rekomendasi channel yang mirip atau serupa.
           </p>
         </article>
         <article class="info-card glass-card-sm">
           <div class="info-card__icon" aria-hidden="true">🔎</div>
           <h3 class="info-card__title">Kategori Judul Video</h3>
           <p class="info-card__desc">
-            Masukkan judul video yang anda inginkan dan IndoBERT akan memproses
-            teks lalu mencari channel yang paling relevan.
+            Masukkan judul video yang anda inginkan, lalu IndoBERT akan
+            memproses teks yang sudah di input tersebut, untuk memahami maknanya
+            dan mencari channel yang paling relevan dengan hasil rekomendasi
+            yang akurat.
           </p>
         </article>
         <article class="info-card glass-card-sm">
           <div class="info-card__icon" aria-hidden="true">📊</div>
-          <h3 class="info-card__title">Performa</h3>
+          <h3 class="info-card__title">Evaluasi Performa Model</h3>
           <p class="info-card__desc">
-            Precision@5 menghasilkan rata-rata akurasi dengan nilai sebesar
-            <strong>92%</strong> pada 20 test channel lintas 10 kategori.
+            Precision@10 menghasilkan rata-rata akurasi dengan nilai sebesar
+            <strong>66%</strong>, disusul dengan Precision@9 menghasilkan
+            <strong>72%</strong>, lalu Precision@8 menghasilkan
+            <strong>80%</strong> dan Precision@1-7 menghasilkan
+            <strong>90%</strong> pada 20 test channel lintas 10 kategori.
           </p>
         </article>
       </section>
