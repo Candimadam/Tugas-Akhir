@@ -375,12 +375,20 @@ body {
   display: grid;
   gap: 0.8rem;
 }
+
 .query-summary,
 .query-summary__left,
-.results-header,
 .score-wrap {
   display: flex;
 }
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
 .query-summary {
   display: grid;
   gap: 0.5rem;
