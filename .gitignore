@@ -57,9 +57,11 @@ output/fine_tuning_experiment/train_split.csv
 output/fine_tuning_experiment/val_split.csv
 output/fine_tuning_experiment/test_split.csv
 output/fine_tuning_experiment/training_history.csv
+output/fine_tuning_experiment/preprocessing_results.csv
 
 # Ignore model weights (will auto-download or use fine-tuning.ipynb)
 output/fine_tuning_experiment/model_fine_tuned/model.safetensors
+output1/fine_tuning_experiment/model_fine_tuned/model.safetensors
 
 # Zone.Identifier files (Windows)
 *:Zone.Identifier

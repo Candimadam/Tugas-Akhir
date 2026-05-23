@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import re
+import emoji
 from typing import Optional
 
 import numpy as np
@@ -139,38 +140,16 @@ def load_data() -> None:
 # PREPROCESSING TEKS (SAMA DENGAN PIPELINE DI NOTEBOOK)
 def text_cleaning(text: str) -> str:
     """
-    Hapus emoji, simbol non-standar, dan karakter encoding rusak.
-    Tanda baca standar (.,?!) dipertahankan agar sesuai pelatihan IndoBERT.
+    Hapus emoji, karakter kontrol, dan simbol dekoratif yang tidak dibutuhkan.
+    Menjaga tanda baca standar (.,?!) agar konsisten dengan pelatihan IndoBERT.
+    Implementasi diselaraskan dengan notebook `fine-tunning.ipynb`.
     """
-    if not isinstance(text, str):
-        return ""
+    # Hapus emoji, karakter kontrol, dan simbol dekoratif yang tidak dibutuhkan
+    text = emoji.replace_emoji(text, replace=' ')
+    text = re.sub(r'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]|[^\w\s.,?!\-()/@#%+=\'":;]', ' ', text, flags=re.UNICODE)
 
-    # Hapus emoji & simbol Unicode non-standar
-    emoji_pattern = re.compile(
-        "["
-        "\U0001F600-\U0001F64F"   # emoticons wajah (😀 😁 😂 😍 😭 😡 🙏)
-        "\U0001F300-\U0001F5FF"   # simbol & piktogram (🌟 🌈 🌍 🌙 🔥 💡 🎉)
-        "\U0001F680-\U0001F6FF"   # transport & peta (🚗 🚕 🚌 🚆 ✈️ 🚀 🚢)
-        "\U0001F1E0-\U0001F1FF"   # bendera (🇮🇩 🇺🇸 🇯🇵 🇰🇷 🇬🇧)
-        "\U00002600-\U000026FF"   # simbol umum (☀️ ☁️ ☂️ ☕ ☎️ ♨️ ⚽)
-        "\U00002700-\U000027BF"   # Dingbats (✂️ ✈️ ✉️ ✅ ❌ ❗ ❤)
-        "\U0001F900-\U0001F9FF"   # simbol tambahan (🤣 🤖 🤩 🤯 🤔 🥳 🧠 🦾)
-        "\U0001FA00-\U0001FA6F"   # simbol tambahan-A (🩰 🩸 🪀 🪁 🪐 🪑)
-        "\U0001FA70-\U0001FAFF"   # simbol tambahan-B (🩷 🩵 🩶 🪪 🪫 🫠 🫶)
-        "\U00002300-\U000023FF"   # teknis (⌚ ⌛ ⏰ ⏱️ ⏲️ ⏳)
-        "]+",
-        flags=re.UNICODE,
-    )
-    text = emoji_pattern.sub(" ", text)
-
-    # Hapus karakter non-printable / encoding rusak
-    text = re.sub(r"[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]", " ", text)
-
-    # Hapus simbol dekoratif (pertahankan huruf, angka, tanda baca standar)
-    text = re.sub(r"[^\w\s.,?!\-()/@#%+=\'\":;]", " ", text, flags=re.UNICODE)
-
-    # Rapikan spasi berlebih
-    text = re.sub(r"\s+", " ", text).strip()
+    # Rapikan spasi berlebih di akhir proses cleaning
+    text = re.sub(r'\s+', ' ', text).strip()
     return text
 
 
