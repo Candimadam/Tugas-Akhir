@@ -1,18 +1,3 @@
-"""
-app.py - Flask Application: YouTube Channel Recommendation System (Dual-Mode)
-===============================================================================
-Mendukung DUA mode input:
-  Mode 1 — Channel → Channel:
-    - Ambil embedding channel dari precomputed matrix
-    - Hitung cosine similarity via precomputed similarity matrix (O(1))
-
-  Mode 2 — Judul Video → Channel:
-    - Preprocessing teks (text cleaning + lowercase)
-    - Tokenisasi + inference IndoBERT fine-tuned (runtime embedding)
-    - Mean pooling hidden state → L2 normalization
-    - Hitung cosine similarity dengan semua channel embeddings (dot product)
-"""
-
 import json
 import logging
 import os
@@ -27,7 +12,6 @@ from flask import Flask, jsonify, render_template, request
 from sklearn.preprocessing import normalize
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-
 # KONFIGURASI LOGGING
 logging.basicConfig(
     level=logging.INFO,
@@ -35,7 +19,6 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
-
 
 # PATH KONFIGURASI
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
@@ -64,21 +47,15 @@ DATA_PATHS = {
     ),
 }
 
-
 # INISIALISASI FLASK
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False  # Support karakter Unicode (Indonesia)
 
-
 # SINGLETON: DATA & MODEL DI-LOAD SEKALI SAAT STARTUP
 _data: dict = {}
 
-
+# Load semua data dan model ke memory saat startup aplikasi
 def load_data() -> None:
-    """
-    Load semua artefak ke memory saat startup aplikasi.
-    Meliputi: data channel, precomputed embeddings, model IndoBERT, tokenizer.
-    """
     global _data
 
     logger.info("Memuat data dan model...")
@@ -136,14 +113,8 @@ def load_data() -> None:
         device,
     )
 
-
 # PREPROCESSING TEKS (SAMA DENGAN PIPELINE DI NOTEBOOK)
 def text_cleaning(text: str) -> str:
-    """
-    Hapus emoji, karakter kontrol, dan simbol dekoratif yang tidak dibutuhkan.
-    Menjaga tanda baca standar (.,?!) agar konsisten dengan pelatihan IndoBERT.
-    Implementasi diselaraskan dengan notebook `fine-tunning.ipynb`.
-    """
     # Hapus emoji, karakter kontrol, dan simbol dekoratif yang tidak dibutuhkan
     text = emoji.replace_emoji(text, replace=' ')
     text = re.sub(r'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]|[^\w\s.,?!\-()/@#%+=\'":;]', ' ', text, flags=re.UNICODE)
@@ -152,24 +123,12 @@ def text_cleaning(text: str) -> str:
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
-
 def preprocess_query(text: str) -> str:
     """Pipeline preprocessing: text cleaning → lowercase."""
     return text_cleaning(text).lower()
 
-
 # EMBEDDING FUNCTIONS (MODE 2)
 def mean_pooling(last_hidden_state: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
-    """
-    Masked mean pooling atas hidden states.
-
-    Args:
-        last_hidden_state : (batch, seq_len, hidden_size)
-        attention_mask    : (batch, seq_len)   — 1 = token nyata, 0 = padding
-
-    Returns:
-        pooled            : (batch, hidden_size)
-    """
     mask_expanded = attention_mask.unsqueeze(-1).float()   # (batch, seq, 1)
     summed        = (last_hidden_state * mask_expanded).sum(dim=1)
     counts        = torch.clamp(mask_expanded.sum(dim=1), min=1e-9)
@@ -177,19 +136,6 @@ def mean_pooling(last_hidden_state: torch.Tensor, attention_mask: torch.Tensor) 
 
 
 def embed_text(text: str) -> np.ndarray:
-    """
-    Hasilkan embedding L2-normalized untuk satu teks input.
-
-    Pipeline:
-      1. Preprocessing (text_cleaning + lowercase)
-      2. Tokenisasi IndoBERT
-      3. Inference encoder (torch.no_grad)
-      4. Mean pooling
-      5. L2 normalization
-
-    Returns:
-        embedding: ndarray shape (768,)
-    """
     tokenizer  = _data["tokenizer"]
     encoder    = _data["encoder"]
     device     = _data["device"]
@@ -219,10 +165,8 @@ def embed_text(text: str) -> np.ndarray:
     pooled_np = pooled.cpu().numpy().astype(np.float32)      # shape (1, 768)
     return normalize(pooled_np, norm="l2")[0]                 # shape (768,)
 
-
 # RECOMMENDATION FUNCTIONS
 def get_channel_info(channel_name: str) -> dict:
-    """Ambil metadata channel (kategori, subscriber, link)."""
     info = _data["channel_info"]
     if channel_name in info.index:
         row = info.loc[channel_name]
@@ -233,9 +177,8 @@ def get_channel_info(channel_name: str) -> dict:
         }
     return {"kategori": "-", "jumlah_pelanggan": 0, "link_channel": "#"}
 
-
+# Bantu bangun response hasil rekomendasi untuk kedua mode (Mode 1 & Mode 2)
 def _build_results(top_k_scores: pd.Series) -> list[dict]:
-    """Helper: ubah Series skor similarity → list dict hasil rekomendasi."""
     results = []
     for rank, (ch_name, score) in enumerate(top_k_scores.items(), start=1):
         info = get_channel_info(ch_name)
@@ -249,20 +192,11 @@ def _build_results(top_k_scores: pd.Series) -> list[dict]:
         })
     return results
 
-
+# Mode 1: Rekomendasi berdasarkan nama channel (lookup similarity matrix)
 def recommend_from_channel(
     channel_name: str,
     top_k: int = 5,
 ) -> Optional[list[dict]]:
-    """
-    Mode 1: Rekomendasi channel berdasarkan nama channel.
-
-    Menggunakan precomputed similarity matrix → lookup O(1).
-    Channel itu sendiri selalu dikecualikan dari hasil.
-
-    Returns:
-        List hasil rekomendasi, atau None jika channel tidak ditemukan.
-    """
     similarity_df: pd.DataFrame = _data["similarity_df"]
 
     if channel_name not in similarity_df.index:
@@ -277,25 +211,11 @@ def recommend_from_channel(
     )
     return _build_results(sim_scores)
 
-
+# Mode 2: Rekomendasi berdasarkan judul video bebas (embedding + dot product)
 def recommend_from_query(
     query_text: str,
     top_k: int = 5,
 ) -> list[dict]:
-    """
-    Mode 2: Rekomendasi channel berdasarkan judul video bebas.
-
-    Pipeline:
-      1. embed_text(query_text)  → embedding L2-normalized (768,)
-      2. Dot product dengan channel_matrix (sudah L2-normalized)
-         → setara cosine similarity
-      3. Ambil Top-K channel dengan skor tertinggi
-
-    Returns:
-        List hasil rekomendasi.
-    Raises:
-        ValueError jika teks kosong.
-    """
     channel_matrix: np.ndarray = _data["channel_matrix"]   # (100, 768)
     channel_names:  list[str]  = _data["channel_names"]
 
@@ -312,26 +232,22 @@ def recommend_from_query(
     )
     return _build_results(top_scores)
 
-
 # HELPERS: PARSE PAYLOAD
 def _parse_payload() -> dict:
-    """Dukung JSON body maupun form-data."""
     if request.is_json:
         return request.get_json(silent=True) or {}
     return request.form.to_dict()
 
-
+# HELPERS: VALIDASI TOP-K
 def _parse_top_k(payload: dict, default: int = 5) -> int:
     try:
         return max(1, min(int(payload.get("top_k", default)), 10))
     except (ValueError, TypeError):
         return default
 
-
-# ROUTES
+# ROUTES: Halaman utama dengan form dual-mode
 @app.route("/", methods=["GET"])
 def index():
-    """Halaman utama — tampilkan form dual-mode."""
     channel_names = _data.get("channel_names", [])
     ft_metadata   = _data.get("ft_metadata", {})
     return render_template(
@@ -340,19 +256,9 @@ def index():
         ft_metadata=ft_metadata,
     )
 
-
+# API endpoint untuk rekomendasi channel berdasarkan nama channel (Mode 1)
 @app.route("/recommend_channel", methods=["POST"])
 def api_recommend_channel():
-    """
-    Mode 1: Rekomendasi channel → channel.
-
-    Request JSON/form:
-      - channel_name : str  (nama channel query)
-      - top_k        : int  (default 5, max 10)
-
-    Response JSON:
-      - mode, query_channel, query_info, top_k, results, error
-    """
     payload      = _parse_payload()
     channel_name = payload.get("channel_name", "").strip()
     top_k        = _parse_top_k(payload)
@@ -377,19 +283,9 @@ def api_recommend_channel():
         "error":         None,
     })
 
-
+# API endpoint untuk rekomendasi channel berdasarkan judul video bebas (Mode 2)
 @app.route("/recommend_query", methods=["POST"])
 def api_recommend_query():
-    """
-    Mode 2: Rekomendasi channel berdasarkan judul video bebas.
-
-    Request JSON/form:
-      - query_text : str  (judul video yang dimasukkan user)
-      - top_k      : int  (default 5, max 10)
-
-    Response JSON:
-      - mode, query_text, query_text_processed, top_k, results, error
-    """
     payload    = _parse_payload()
     query_text = payload.get("query_text", "").strip()
     top_k      = _parse_top_k(payload)
@@ -415,24 +311,21 @@ def api_recommend_query():
         "error":                None,
     })
 
-
+# API endpoint untuk daftar semua channel (untuk dropdown di frontend)
 @app.route("/channels", methods=["GET"])
 def list_channels():
-    """Daftar semua channel yang tersedia."""
     channel_names = sorted(_data.get("channel_names", []))
     return jsonify({"channels": channel_names, "total": len(channel_names)})
 
-
+# API endpoint untuk health check
 @app.route("/health", methods=["GET"])
 def health():
-    """Health check endpoint."""
     return jsonify({
         "status":         "ok",
         "total_channels": len(_data.get("channel_names", [])),
         "model":          _data.get("ft_metadata", {}).get("model_name", "unknown"),
         "modes":          ["channel", "query"],
     })
-
 
 # ENTRYPOINT
 if __name__ == "__main__":

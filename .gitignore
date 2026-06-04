@@ -37,19 +37,32 @@ instance/
 .webassets-cache
 
 # OUTPUT FOLDER - Ignore ONLY large files NOT needed for web app
-# Keep: channel_names.csv, video_metadata.csv, fine_tuning_experiment essentials
 # Ignore large embeddings/preprocessed data
 output/video_embeddings.npy
 output/preprocessed_data.csv
+output2/video_embeddings.npy
+output2/preprocessed_data.csv
+output3/video_embeddings.npy
+output3/preprocessed_data.csv
 
 # Ignore baseline model files (not needed)
 output/channel_matrix.npy
 output/similarity_matrix.npy
 output/similarity_matrix.csv
 output/evaluation_results.csv
+output2/channel_matrix.npy
+output2/similarity_matrix.npy
+output2/similarity_matrix.csv
+output2/evaluation_results.csv
+output3/channel_matrix.npy
+output3/similarity_matrix.npy
+output3/similarity_matrix.csv
+output3/evaluation_results.csv
 
 # Ignore advanced_experiment (comparison only, not needed)
 output/advanced_experiment/
+output2/advanced_experiment/
+output3/advanced_experiment/
 
 # Ignore large files in fine_tuning_experiment (can be regenerated)
 output/fine_tuning_experiment/video_embeddings_fine_tuned.npy
@@ -58,10 +71,24 @@ output/fine_tuning_experiment/val_split.csv
 output/fine_tuning_experiment/test_split.csv
 output/fine_tuning_experiment/training_history.csv
 output/fine_tuning_experiment/preprocessing_results.csv
+output2/fine_tuning_experiment/video_embeddings_fine_tuned.npy
+output2/fine_tuning_experiment/train_split.csv
+output2/fine_tuning_experiment/val_split.csv
+output2/fine_tuning_experiment/test_split.csv
+output2/fine_tuning_experiment/training_history.csv
+output2/fine_tuning_experiment/preprocessing_results.csv
+output3/fine_tuning_experiment/video_embeddings_fine_tuned.npy
+output3/fine_tuning_experiment/train_split.csv
+output3/fine_tuning_experiment/val_split.csv
+output3/fine_tuning_experiment/test_split.csv
+output3/fine_tuning_experiment/training_history.csv
+output3/fine_tuning_experiment/preprocessing_results.csv
 
 # Ignore model weights (will auto-download or use fine-tuning.ipynb)
 output/fine_tuning_experiment/model_fine_tuned/model.safetensors
 output1/fine_tuning_experiment/model_fine_tuned/model.safetensors
+output2/fine_tuning_experiment/model_fine_tuned/model.safetensors
+output3/fine_tuning_experiment/model_fine_tuned/model.safetensors
 
 # Zone.Identifier files (Windows)
 *:Zone.Identifier
