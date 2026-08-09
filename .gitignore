@@ -92,3 +92,5 @@ output3/fine_tuning_experiment/model_fine_tuned/model.safetensors
 
 # Zone.Identifier files (Windows)
 *:Zone.Identifier
+
+# source "/home/candimadam/Documents/Tugas Akhir/.venv/bin/activate"
